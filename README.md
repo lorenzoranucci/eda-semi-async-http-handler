@@ -29,7 +29,7 @@ However, it is not always straightforward to apply retry logic especially if we 
 do not want to block the user indefinitely or cannot force the user to re-post the request.
 
 There are several patterns that help us implement retry. One is the outbox pattern, which we have already seen in
-another project. Another one is making every HTTP request an async event.
+[another project](https://github.com/lorenzoranucci/tor). Another one is making every HTTP request an async event.
 
 ## Make everything async
 
@@ -64,25 +64,45 @@ At this point the HTTP handler can return the response to the HTTP client.
 
 ### Running the demo
 
-Make sure ports `8080`, `8082`, `3306` and `9093` are available. 
+Make sure ports `8080`, `8082`, `3306` and `9093` are available.
 Otherwise, you can change the ports in the `docker-compose.override.yaml` file.
 
 Start the services:
+
 ```shell
-docker compose up -d --build --force-recreate
+docker-compose up -d --build --force-recreate
 ```
 
 Make sure that every service is up and running.
 
 Send a request to the HTTP handler:
+
 ```shell
 curl -X POST --location "http://localhost:8080" \
     -H "Content-Type: application/json" \
     -d "{
           \"name\": \"Lorenzo Ranucci\"
-        }"
+        }" \
+    -i
 ```
 
+It should return a `201 Created` response code.
 
+Sending again the same request should return a `409 Conflict` response code.
 
-Connect to http://localhost:8082 and watch the Kafka topics.
+Sending a new request with a different name should return a `201 Created` response code.
+
+Connect to http://localhost:8082 and watch messages in the Kafka topics.
+
+Connect to mysql on localhost:3306 and run the following query:
+
+```sql
+SELECT *
+FROM users;
+```
+
+You should see the users that you have created.
+
+Note that the HTTP handler has 5 seconds timeout. If you send a request and wait more than 5 seconds, you should see
+a `504 Gateway Timeout` response code. This could happen if you are debugging the code and you have set a breakpoint or
+if you docker environment is slow.
