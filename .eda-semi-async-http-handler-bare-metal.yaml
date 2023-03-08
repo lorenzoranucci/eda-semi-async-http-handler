@@ -1,0 +1,8 @@
+dbHost: localhost
+dbPort: 3306
+dbUser: root
+dbPassword: root
+
+kafkaBrokers: localhost:9093
+
+httpPort: 8081

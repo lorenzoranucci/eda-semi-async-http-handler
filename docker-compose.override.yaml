@@ -1,0 +1,17 @@
+name: eda-semi-async-http-handler
+services:
+  server:
+    ports:
+      - "8080:8080"
+
+  mariadb:
+    ports:
+      - "3306:3306"
+
+  kafka:
+    ports:
+      - "9093:9093"
+
+  kafka-ui:
+    ports:
+      - "8082:8080"
